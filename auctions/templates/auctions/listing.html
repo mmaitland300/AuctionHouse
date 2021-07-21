@@ -1,0 +1,125 @@
+
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class = "container jumbotron">
+        <h1>{{listing.title}}</h1>
+        {% if listing.user == user %}
+            <h2>You are selling this item.</h2>
+        {% else %}
+        <h3>Seller: {{listing.user}}</h3>
+        {% endif %}
+
+    </div>
+
+    <div class="float-container" style="border: 3px; padding: 20px;">
+        <div class="float-child" style="width: 50%; float: left; padding: 20px; border: 2px;">
+            <div class="1">
+            {% if listing.image %}
+                <br><br>
+                <img src="{{ listing.image }}" style = "width: 30vw;">
+
+            {% endif %}
+            </div>
+        </div>
+        <hr>
+        <div class="float-child" style="width: 50%; float: left; padding: 20px; border: 2px;">
+            <div class="2">
+
+            <h5>Description:</h5><p style = "font-family: Georgia, 'Times New Roman', Times, serif;">{{listing.description}}</p>
+        <br>
+            {% if listing.category %}
+
+                <p>Category: <a href="{% url 'category_listings' listing.category %}"> <span style = "color:darkgray; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{listing.category}}</span></a></p>
+                
+            {% endif %}
+        <br>
+            {% if listing.active %}
+
+                <h5>Current Bid:   ${{high_bid}}.00 </h5>
+
+            {% endif %}
+        <br>
+            {% if user.is_authenticated and listing.active and listing.user != user%}
+
+                <form action="{% url 'listing' listing.id %}" method = "post">
+                    {% csrf_token %}
+                    <input type="number" name = "bid" placeholder = ${{min_bid}} min="{{min_bid}}">
+                    <button type="submit" style = "background-color: gold; border-color:gold; color:black; font-weight:bolder; font-family:'Courier New', Courier, monospace">Bid!</button>
+                </form>
+        <br>
+
+                {% if watchlist %}
+
+                    <form action="{% url 'remove_item' listing.id %}" method = "post">
+                        {% csrf_token %}
+                        <button type="submit" style = " background-color:lightgray; color:black; border-radius:1vw;">Remove item from wishlist</button>
+                    </form>
+                {% else %}
+                    <br>
+                    <form action="{% url 'add_item' listing.id %}" method = "post">
+                        {% csrf_token %}
+                        <button type="submit" style = " background-color:lightgray; color:black; border-radius:1vw;">Add item to wishlist</button>
+                    </form>
+                {% endif %}
+        <br><br><br>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    <br><br>
+
+            {% if listing.user == user and listing.active %}
+                
+                <form action="{% url 'close' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit">Close this listing.</button>
+                </form>
+            
+            {% endif %}
+
+            {% if not listing.active %}
+
+                {% if listing.winner == user %}
+
+                    <h3>Congratulations! You have won this item!</h3>
+
+                {% else %}
+
+                    <h3>This item is no longer available.</h3>
+
+                    <h3><b>{{listing.winner}}</b> won the item</h3>
+
+                {% endif %}
+            {% endif %}
+            
+
+            <br><br>
+
+            {% if comments %}
+
+                <h5>Comments Section:</h5>
+                <div class = "container jumbotron">
+                {% for comment in comments %}
+                <hr>
+                        <h6>User: <span style = "color: blue;">{{comment.user}}</span></h6>
+                        <p style = "border-radius: 2rem; background-color: lightgray; color: black; padding: 1rem">{{comment.content}}</p>
+                
+                {% endfor %}
+                
+                </div>
+            {% endif %}
+            
+            <div>
+            {% if user.is_authenticated and listing.active %}
+                <form action="{% url 'listing' listing.id %}" method = "post">
+                    {% csrf_token %}
+                    <input type="text" name="comment" placeholder = "Comment">
+                    <button class = "btn btn-primary dark">Post Comment</button>
+                </form>
+            {% endif %}
+         
+        </div>
+    
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h1>Wishlist</h1>
+
+{% if items %}
+    {% for item in items %}
+        <br>
+        <h4><a href="{% url 'listing' item.listing.id %}">{{ item.listing.title }}</a></h4>
+
+        {% if item.listing.image %}
+        <img src="{{ item.listing.image }}" style="width:30vw">
+        {% endif %}
+
+        <h6>Sold by: {{ item.listing.user }}</h6>
+    
+        <p>Category: <span style = "color:darkgray; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ item.listing.category}}</span></p>
+        
+        <hr>
+    {% endfor %}
+{% else %}
+    <h5>No items being watched</h5>
+{% endif %}
+
+{% endblock %}
